@@ -1,0 +1,67 @@
+﻿@page
+@model NguyenIT.Quiz.Pages.QuizModel
+
+<h1 class="text-center">@Model.GetTitle(Model.Year, Model.Number) - Năm @Model.Year</h1>
+<p class="text-center mb-3">Tổng số câu hỏi: <strong>@Model.Quizs.Count</strong></p>
+
+@foreach (var quiz in Model.Quizs)
+{
+
+    int maxCount = 4;
+    if (string.IsNullOrEmpty(quiz.D))
+        maxCount = 3;
+    else if (string.IsNullOrEmpty(quiz.C))
+        maxCount = 2;
+    else if (string.IsNullOrEmpty(quiz.B))
+        maxCount = 1;
+    Random random = new Random();
+    int correct = random.Next(0, maxCount);
+    //if (correct == 4)
+    //{
+
+    <h5 class="mt-4">@(quiz.Id+1). @quiz.Question</h5>
+    if (!string.IsNullOrEmpty(quiz.A))
+    {
+        @await Html.PartialAsync("QuestionAnswer", new { Id = "A" + quiz.Id, Name = quiz.Id, Text = quiz.A })
+
+    }
+    if (!string.IsNullOrEmpty(quiz.B))
+    {
+        @await Html.PartialAsync("QuestionAnswer", new { Id = "B" + quiz.Id, Name = quiz.Id, Text = quiz.B })
+
+    }
+    @*}*@
+    if (!string.IsNullOrEmpty(quiz.C))
+    {
+        @await Html.PartialAsync("QuestionAnswer", new { Id = "C" + quiz.Id, Name = quiz.Id, Text = quiz.C })
+
+    }
+    if (!string.IsNullOrEmpty(quiz.D))
+    {
+        @await Html.PartialAsync("QuestionAnswer", new { Id = "D" + quiz.Id, Name = quiz.Id, Text = quiz.D })
+
+    }
+}
+@section Scripts {
+    <script type="text/javascript">
+    var arrayOfArrays = JSON.parse('@Html.Raw(Json.Serialize(Model.Quizs))');
+    $(document).ready(function () {
+        $('input[type=radio]').click(function (e) {
+            console.log(this.id);
+            var answer = this.id.substr(0, 1);
+            var id = this.id.replace(answer, '');
+            console.log(answer);
+            console.log(id);
+            console.log(arrayOfArrays[Number(id)]);
+            if (arrayOfArrays[Number(id)].answer == answer.toLowerCase()) {
+                $(this).parent().addClass("bg-success");
+            }
+            else {
+
+                $(this).parent().addClass("bg-danger");
+                $('#' + Number(id) + arrayOfArrays[Number(id)].answer).parent().addClass("bg-primary");
+            }
+        });
+    });
+    </script>
+}
